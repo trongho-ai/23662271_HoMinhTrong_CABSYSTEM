@@ -255,3 +255,396 @@ __GẶP KHÁCH HÀNG LẦN NỮA__
 | **FR-ADM-04** | Quản lý phân quyền (RBAC) | Tạo Role (Quản trị viên, Nhân viên CSKH) và gán quyền thao tác cụ thể cho từng Role. | BR-24, BR-32 |
 | **FR-ADM-05** | Trích xuất báo cáo | Xuất các biểu đồ/file Excel về: số chuyến, doanh thu, tỷ lệ hủy, hiệu suất tài xế theo khoảng thời gian. | BR-25 |
 | **FR-ADM-06** | System Log | Ghi nhận tự động (Lưu vết) thao tác của Admin và các lỗi hệ thống nghiêm trọng. | BR-33, BR-34 |
+
+# Bước 9: Business Rules & Exceptions (Quy tắc nghiệp vụ và Ngoại lệ)
+
+## 9.1. Quy tắc nghiệp vụ (Business Rules - Cập nhật vét cạn)
+
+| Mã số | Tên quy tắc | Mô tả chi tiết |
+|---|---|---|
+| **RULE-01** | Điều kiện nhận chuyến | Tài xế chỉ có thể nhận được thông báo chuyến đi khi chuyển sang trạng thái sẵn sàng nhận chuyến trong lúc làm việc. |
+| **RULE-02** | Tiêu chí ưu tiên phân công | Việc xác định tài xế phải dựa trên vị trí, trạng thái sẵn sàng và các tiêu chí vận hành khác; ưu tiên tài xế phù hợp và gần khách hàng nhất. |
+| **RULE-03** | Quy tắc tính cước | Số tiền khách hàng phải trả được xác định sau khi chuyến đi hoàn thành, dựa trên loại dịch vụ và thông tin chuyến đi. |
+| **RULE-04** | Quy định lưu trữ thanh toán | Không lưu trữ trực tiếp thông tin nhạy cảm của thẻ hoặc tài khoản thanh toán trong hệ thống CAB. |
+| **RULE-05** | Quy tắc kích hoạt thông báo khách hàng | Khách hàng phải nhận được thông báo tại 5 mốc thời gian: (1) yêu cầu được tiếp nhận, (2) có tài xế nhận chuyến, (3) tài xế đến điểm đón, (4) chuyến hoàn thành, (5) có kết quả thanh toán. |
+| **RULE-06** | Quy tắc kích hoạt thông báo tài xế | Tài xế phải nhận được thông báo về các chuyến mới hoặc những thay đổi liên quan đến chuyến đang thực hiện. |
+| **RULE-07** | Bắt buộc xác thực | Khách hàng và tài xế phải được xác thực trước khi sử dụng các chức năng yêu cầu tài khoản. |
+| **RULE-08** | Kiểm soát quyền quản trị | Các thao tác quản trị phải được kiểm soát quyền truy cập; nhân viên thông thường không thể thực hiện thao tác nhạy cảm. |
+| **RULE-09** | Chỉ số báo cáo bắt buộc | Hệ thống phải cung cấp được báo cáo về: số lượng chuyến, doanh thu, tỷ lệ chuyến hoàn thành, tỷ lệ hủy và hiệu quả hoạt động của tài xế. |
+| **RULE-10** | Lưu vết (Audit Log) | Hệ thống phải lưu vết các thao tác quan trọng để phục vụ kiểm tra khi có sự cố. |
+
+## 9.2. Các trường hợp ngoại lệ (Exceptions)
+
+| Mã số | Tình huống ngoại lệ | Hướng xử lý của hệ thống |
+|---|---|---|
+| **EX-01** | Tài xế từ chối / Không phản hồi | Hệ thống tiếp tục tìm tài xế khác mà không yêu cầu khách hàng tạo lại yêu cầu. |
+| **EX-02** | Không tìm được tài xế | Khách hàng phải được thông báo rõ ràng. |
+| **EX-03** | Giao dịch điện tử thất bại | Hệ thống thông báo cho khách hàng và cho phép xử lý lại theo chính sách của doanh nghiệp. |
+
+## 9.3. Các điểm chưa rõ cần xác nhận thêm (Pending Clarifications)
+
+*Khách hàng yêu cầu BA làm rõ các vấn đề sau với các bên liên quan trước khi phát triển giải pháp:*
+1. Cách tính cước cụ thể.
+2. Tiêu chí ưu tiên tài xế cụ thể.
+3. Thời gian tài xế phải phản hồi.
+4. Chính sách hủy chuyến.
+5. Cách xử lý khi mất kết nối mạng.
+6. Thời gian lưu trữ dữ liệu.
+
+---
+
+# Bước 10: Mô hình hóa dữ liệu (Entity Relationship Diagram - ERD)
+
+## 10.1. Danh sách Thực thể (Entities) và Thuộc tính (Attributes)
+
+1. **Khách hàng (Customer)**
+   - `CustomerID` (PK): Mã khách hàng
+   - `FullName`: Họ và tên
+   - `Phone`: Số điện thoại
+   - `Email`: Địa chỉ email
+   - `Password`: Mật khẩu (đã mã hóa)
+   - `Status`: Trạng thái tài khoản (Active, Banned)
+
+2. **Tài xế (Driver)**
+   - `DriverID` (PK): Mã tài xế
+   - `FullName`: Họ và tên
+   - `Phone`: Số điện thoại
+   - `Status`: Trạng thái tài khoản (Active, Pending, Banned)
+   - `AvailabilityStatus`: Trạng thái làm việc (Online, Offline, In-Trip)
+   - `CurrentLocation`: Tọa độ GPS hiện tại (Lat, Long)
+
+3. **Phương tiện (Vehicle)**
+   - `VehicleID` (PK): Mã phương tiện
+   - `DriverID` (FK): Mã tài xế
+   - `LicensePlate`: Biển số xe
+   - `VehicleType`: Loại xe (4 chỗ, 7 chỗ, xe máy)
+   - `Brand`: Hiệu xe
+   - `Color`: Màu sắc
+
+4. **Chuyến đi (Trip)**
+   - `TripID` (PK): Mã chuyến đi
+   - `CustomerID` (FK): Mã khách hàng
+   - `DriverID` (FK): Mã tài xế (Nullable - trống lúc mới đặt)
+   - `PickupLocation`: Điểm đón
+   - `DropoffLocation`: Điểm đến
+   - `EstimatedFare`: Giá cước dự kiến
+   - `ActualFare`: Giá cước thực tế
+   - `Status`: Trạng thái (Finding, Assigned, Arrived, InProgress, Completed, Cancelled)
+   - `CreatedAt`: Thời gian tạo yêu cầu
+
+5. **Thanh toán (Payment)**
+   - `PaymentID` (PK): Mã thanh toán
+   - `TripID` (FK): Mã chuyến đi
+   - `Method`: Phương thức (Cash, E-wallet, Credit Card)
+   - `Amount`: Số tiền thanh toán
+   - `Status`: Trạng thái giao dịch (Pending, Success, Failed)
+   - `TransactionID`: Mã giao dịch từ bên thứ 3 (Nullable)
+   - `PaymentDate`: Thời gian thanh toán
+
+6. **Đánh giá (Review)**
+   - `ReviewID` (PK): Mã đánh giá
+   - `TripID` (FK): Mã chuyến đi
+   - `CustomerID` (FK): Mã khách hàng
+   - `DriverID` (FK): Mã tài xế
+   - `Rating`: Điểm số (1 đến 5)
+   - `Comment`: Nhận xét
+   - `CreatedAt`: Thời gian tạo
+
+
+## 10.2. Sơ đồ ERD (Mermaid)
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ TRIP : "tạo"
+    CUSTOMER ||--o{ REVIEW : "viết"
+    DRIVER ||--o{ TRIP : "thực hiện"
+    DRIVER ||--o{ REVIEW : "nhận"
+    DRIVER ||--o| VEHICLE : "sở hữu/đăng ký"
+    TRIP ||--|| PAYMENT : "có"
+    TRIP ||--o| REVIEW : "được đánh giá"
+
+    CUSTOMER {
+        string CustomerID PK
+        string FullName
+        string Phone
+        string Email
+        string Status
+    }
+    
+    DRIVER {
+        string DriverID PK
+        string FullName
+        string Phone
+        string Status
+        string AvailabilityStatus
+        string CurrentLocation
+    }
+    
+    VEHICLE {
+        string VehicleID PK
+        string DriverID FK
+        string LicensePlate
+        string VehicleType
+        string Brand
+    }
+    
+    TRIP {
+        string TripID PK
+        string CustomerID FK
+        string DriverID FK
+        string PickupLocation
+        string DropoffLocation
+        float ActualFare
+        string Status
+    }
+    
+    PAYMENT {
+        string PaymentID PK
+        string TripID FK
+        string Method
+        float Amount
+        string Status
+        string TransactionID
+    }
+    
+    REVIEW {
+        string ReviewID PK
+        string TripID FK
+        string CustomerID FK
+        string DriverID FK
+        int Rating
+        string Comment
+    }
+
+
+
+
+
+
+
+
+
+```
+
+
+
+
+
+# Bước 11: Yêu cầu phi chức năng (Non-Functional Requirements - NFR)
+
+| Nhóm NFR | Mã số | Yêu cầu chi tiết |
+|---|---|---|
+| **Hiệu suất & Độ tin cậy** | **NFR-01** | Hệ thống phải hoạt động ổn định vào các thời điểm nhu cầu tăng cao. |
+| | **NFR-02** | Phải cô lập lỗi: Lỗi xảy ra ở chức năng thanh toán hoặc thông báo không được làm cho toàn bộ hệ thống đặt xe ngừng hoạt động. |
+| **Khả năng mở rộng** | **NFR-03** | Các thành phần của hệ thống cần có khả năng mở rộng độc lập khi tải tăng. |
+| | **NFR-04** | Hệ thống phải phục vụ được số lượng lớn khách hàng và tài xế. |
+| **Khả năng bảo trì & Linh hoạt**| **NFR-05** | Các chức năng mới có thể được triển khai từng phần, hạn chế ảnh hưởng đến các chức năng đang hoạt động. |
+| | **NFR-06** | Kiến trúc đủ linh hoạt để trong tương lai có thể bổ sung dịch vụ mới, phương thức thanh toán, nhà cung cấp thông báo, hoặc thay đổi thành phần kỹ thuật mà không phải xây lại toàn bộ ứng dụng. |
+| **Bảo mật** | **NFR-07** | Khách hàng và tài xế phải được xác thực trước khi sử dụng các chức năng yêu cầu tài khoản. |
+| | **NFR-08** | Các thao tác quản trị phải được kiểm soát quyền truy cập; nhân viên thông thường không thể thực hiện thao tác nhạy cảm. |
+| | **NFR-09** | Thông tin cá nhân, thông tin phương tiện, dữ liệu vị trí và dữ liệu giao dịch phải được bảo vệ an toàn. |
+| | **NFR-10** | Hệ thống phải lưu vết (log) các thao tác quan trọng để phục vụ kiểm tra khi có sự cố. |
+| **Ràng buộc dự án** | **CON-01** | Thời gian xây dựng và triển khai sản phẩm là 7 tuần. |
+
+# Bước 12: Sơ đồ và Đặc tả Use Case (Use Case Diagram & Specification)
+
+## 12.1. Sơ đồ Use Case (Mermaid)
+
+```mermaid
+flowchart LR
+    %% Định nghĩa Tác nhân (Actors)
+    CUS(Khách hàng)
+    DRV(Tài xế)
+    ADM(Nhân viên vận hành)
+    PAY{{Cổng thanh toán}}
+
+    %% Ranh giới hệ thống (System Boundary)
+    subgraph Hệ thống CAB
+        direction TB
+        UC1([Đăng nhập / Đăng ký])
+        UC2([Đặt xe])
+        UC3([Theo dõi chuyến đi])
+        UC4([Thanh toán cước phí])
+        UC5([Đánh giá tài xế])
+        
+        UC6([Bật/Tắt sẵn sàng])
+        UC7([Chấp nhận/Từ chối chuyến])
+        UC8([Cập nhật trạng thái chuyến])
+        
+        UC9([Quản lý User & Phương tiện])
+        UC10([Giám sát chuyến đi lỗi])
+        UC11([Xem báo cáo thống kê])
+    end
+
+    %% Tương tác của Khách hàng
+    CUS --- UC1
+    CUS --- UC2
+    CUS --- UC3
+    CUS --- UC4
+    CUS --- UC5
+
+    %% Tương tác của Tài xế
+    DRV --- UC1
+    DRV --- UC6
+    DRV --- UC7
+    DRV --- UC8
+
+    %% Tương tác của Admin
+    ADM --- UC9
+    ADM --- UC10
+    ADM --- UC11
+
+    %% Tương tác với Hệ thống bên ngoài
+    UC4 -.->|<<include>>| PAY
+
+```
+
+### Đặc tả UC-CUS-02: Đặt xe
+
+| Thuộc tính | Chi tiết |
+|---|---|
+| **Tên Use Case** | Đặt xe |
+| **Tác nhân chính** | Khách hàng |
+| **Mô tả ngắn** | Khách hàng thiết lập điểm đón, điểm đến, chọn loại xe và gửi yêu cầu tìm tài xế. |
+| **Tiền điều kiện** | Khách hàng đã đăng nhập; hệ thống có kết nối mạng. |
+| **Hậu điều kiện**| Một bản ghi chuyến đi (Trip) được tạo với trạng thái "Đang tìm tài xế". |
+| **Luồng sự kiện chính** | 1. Khách hàng chọn chức năng "Đặt xe".<br>2. Hệ thống định vị điểm đón hiện tại.<br>3. Khách hàng nhập điểm đến.<br>4. Hệ thống hiển thị các loại xe và giá cước dự kiến.<br>5. Khách hàng chọn loại xe và bấm "Đặt xe".<br>6. Hệ thống tạo yêu cầu, chuyển trạng thái "Đang tìm tài xế" và hiển thị màn hình chờ. |
+| **Ngoại lệ** | **A1. Không có xe:** Nếu không có xe khả dụng, hệ thống báo "Hiện không có xe" và khóa nút đặt.<br>**A2. Khách hủy:** Khách bấm "Hủy" khi đang tìm xe, hệ thống kết thúc luồng. |
+
+### Đặc tả UC-DRV-03: Phản hồi yêu cầu chuyến đi
+
+| Thuộc tính | Chi tiết |
+|---|---|
+| **Tên Use Case** | Phản hồi yêu cầu chuyến đi |
+| **Tác nhân chính** | Tài xế |
+| **Mô tả ngắn** | Tài xế nhận yêu cầu điều phối từ hệ thống và quyết định nhận hoặc bỏ qua. |
+| **Tiền điều kiện** | Tài xế đang "Sẵn sàng" và không vướng chuyến khác. |
+| **Hậu điều kiện**| Chuyến đi có tài xế phụ trách, hoặc hệ thống chuyển yêu cầu cho người khác. |
+| **Luồng sự kiện chính** | 1. Hệ thống hiển thị pop-up yêu cầu (khoảng cách, giá) và bắt đầu đếm ngược.<br>2. Tài xế bấm "Chấp nhận".<br>3. Hệ thống ghi nhận tài xế cho chuyến đi này.<br>4. Ứng dụng chuyển sang chế độ điều hướng đến điểm đón. |
+| **Ngoại lệ** | **A1. Từ chối / Hết giờ (Timeout):** Tài xế bấm "Từ chối" hoặc hết thời gian đếm ngược, pop-up đóng lại. Hệ thống ngầm đẩy chuyến cho tài xế tiếp theo. |
+
+### Đặc tả UC-CUS-04: Thanh toán cước phí
+
+| Thuộc tính | Chi tiết |
+|---|---|
+| **Tên Use Case** | Thanh toán cước phí |
+| **Tác nhân chính** | Khách hàng |
+| **Tiền điều kiện** | Chuyến đi ở trạng thái "Hoàn thành", hệ thống đã chốt số tiền thực tế. |
+| **Hậu điều kiện**| Giao dịch được ghi nhận, chuyến đi hoàn tất trọn vẹn. |
+| **Luồng sự kiện chính** | 1. Hệ thống hiển thị hóa đơn tổng.<br>2. Khách hàng chọn thanh toán qua Thẻ/Ví điện tử.<br>3. Hệ thống gửi yêu cầu sang Cổng thanh toán (không lưu thẻ).<br>4. Cổng thanh toán báo Thành công.<br>5. Hệ thống gửi thông báo hoàn tất cho cả 2 bên. |
+| **Ngoại lệ** | **A1. Tiền mặt:** Khách chọn trả tiền mặt. Tài xế xác nhận "Đã thu tiền" trên app Tài xế -> Hoàn tất.<br>**A2. Giao dịch lỗi:** Cổng thanh toán báo lỗi. Hệ thống yêu cầu khách chọn lại phương thức thanh toán. |
+
+### Đặc tả UC-DRV-04: Cập nhật tiến trình chuyến đi
+
+| Thuộc tính | Chi tiết |
+|---|---|
+| **Tên Use Case** | Cập nhật tiến trình chuyến đi |
+| **Tác nhân chính** | Tài xế |
+| **Tiền điều kiện** | Tài xế đã nhận chuyến thành công. |
+| **Hậu điều kiện**| Chuyến đi chuyển trạng thái "Hoàn thành", kích hoạt tính cước. |
+| **Luồng sự kiện chính** | 1. Tài xế đến nơi, bấm "Đã đến điểm đón" (Khách nhận được thông báo).<br>2. Khách lên xe, Tài xế bấm "Đã đón khách".<br>3. Tài xế lái xe đến đích, bấm "Hoàn thành chuyến".<br>4. Hệ thống chốt cước và chuyển giao diện thanh toán. |
+
+### Đặc tả UC-ADM-02: Giám sát và xử lý chuyến đi lỗi
+
+| Thuộc tính | Chi tiết |
+|---|---|
+| **Tên Use Case** | Giám sát và xử lý chuyến đi lỗi |
+| **Tác nhân chính** | Nhân viên vận hành |
+| **Tiền điều kiện** | Nhân viên đăng nhập và có quyền "Giám sát". |
+| **Luồng sự kiện chính** | 1. Mở Dashboard "Chuyến đi đang diễn ra".<br>2. Chọn một chuyến có cảnh báo lỗi (VD: Khách report, xe đứng im quá lâu).<br>3. Kiểm tra lịch sử tọa độ và log thao tác.<br>4. Thực hiện lệnh can thiệp (Hủy chuyến, Cập nhật lại trạng thái).<br>5. Hệ thống lưu Audit Log thao tác của nhân viên. |
+| **Ngoại lệ** | **A1. Sai phân quyền:** Nhân viên không đủ quyền thao tác sẽ bị hệ thống chặn và báo lỗi truy cập. |
+
+
+# Bước 13: Tiêu chí chấp nhận (Acceptance Criteria - AC)
+
+Dưới đây là Tiêu chí chấp nhận (AC) cho các Use Case cốt lõi, được viết theo định dạng để dễ dàng nghiệm thu khi phát triển hệ thống.
+
+### AC cho UC-CUS-02: Đặt xe
+
+| Mã AC | Mô tả tiêu chí chấp nhận | Trạng thái |
+|---|---|---|
+| **AC-01** | **Xác thực vị trí:** Hệ thống phải tự động điền vị trí hiện tại của khách hàng làm điểm đón (sai số dưới 50m). Khách hàng có thể thay đổi bằng cách nhập text hoặc ghim trên bản đồ. | |
+| **AC-02** | **Hiển thị thông tin xe & giá:** Khi đã có điểm đón và điểm đến, hệ thống phải hiển thị ít nhất 2 loại xe (nếu có sẵn) kèm theo giá cước dự kiến tính toán dựa trên khoảng cách. | |
+| **AC-03** | **Xử lý hết xe:** Nếu không có tài xế nào Online trong bán kính quy định (VD: 5km), hệ thống phải disable nút "Đặt xe" và hiển thị thông báo "Hiện không có xe tại khu vực này". | |
+| **AC-04** | **Khởi tạo chuyến đi:** Khi khách hàng bấm "Đặt xe", hệ thống phải tạo thành công ID chuyến đi mới, trạng thái "Đang tìm tài xế" và chuyển sang màn hình chờ có radar quét. | |
+
+### AC cho UC-DRV-03: Phản hồi yêu cầu chuyến đi
+
+| Mã AC | Mô tả tiêu chí chấp nhận | Trạng thái |
+|---|---|---|
+| **AC-01** | **Hiển thị thông báo:** Pop-up nhận chuyến phải hiển thị rõ 3 thông tin: Điểm đón, Khoảng cách (từ tài xế đến điểm đón), và Giá cước dự kiến. | |
+| **AC-02** | **Chấp nhận chuyến:** Khi tài xế bấm "Chấp nhận" trong thời gian đếm ngược, hệ thống phải gán DriverID vào chuyến đi và chuyển app sang màn hình bản đồ chỉ đường đến điểm đón. | |
+| **AC-03** | **Xử lý Timeout/Từ chối:** Nếu tài xế bấm "Từ chối" hoặc hết 15 giây đếm ngược mà không thao tác, pop-up phải tự đóng và hệ thống đẩy yêu cầu cho tài xế phù hợp tiếp theo. | |
+
+### AC cho UC-CUS-04: Thanh toán cước phí
+
+| Mã AC | Mô tả tiêu chí chấp nhận | Trạng thái |
+|---|---|---|
+| **AC-01** | **Chốt cước phí:** Ngay khi tài xế bấm "Hoàn thành chuyến", app khách hàng phải tự động chuyển sang màn hình Thanh toán hiển thị chính xác số tiền cuối cùng. | |
+| **AC-02** | **Thanh toán điện tử thành công:** Nếu thanh toán qua cổng điện tử thành công, hệ thống phải cập nhật trạng thái hóa đơn thành "Đã thanh toán" và hiển thị màn hình Đánh giá. | |
+| **AC-03** | **Thanh toán điện tử thất bại:** Nếu cổng thanh toán trả về lỗi, hệ thống phải giữ nguyên hóa đơn, báo lỗi rõ ràng và cho phép khách hàng đổi thẻ hoặc đổi sang tiền mặt. | |
+| **AC-04** | **Thanh toán tiền mặt:** Nếu chọn tiền mặt, hệ thống phải đợi tài xế bấm xác nhận "Đã thu đủ tiền" thì mới đóng hóa đơn và hoàn tất giao dịch. | |
+
+### AC cho UC-DRV-04: Cập nhật tiến trình chuyến đi
+
+| Mã AC | Mô tả tiêu chí chấp nhận | Trạng thái |
+|---|---|---|
+| **AC-01** | **Ràng buộc tuần tự:** Tài xế bắt buộc phải cập nhật trạng thái theo đúng thứ tự: Đã đến điểm đón -> Đã đón khách -> Hoàn thành chuyến. Không được nhảy cóc. | |
+| **AC-02** | **Đồng bộ thời gian thực:** Mỗi khi tài xế chuyển trạng thái, app của khách hàng phải tự động cập nhật UI (giao diện) và nhận được Push Notification tương ứng trong vòng 2 giây. | |
+
+### AC cho UC-ADM-02: Giám sát và xử lý chuyến đi lỗi
+
+| Mã AC | Mô tả tiêu chí chấp nhận | Trạng thái |
+|---|---|---|
+| **AC-01** | **Bảo mật truy cập:** Chỉ tài khoản Admin có role "SuperAdmin" hoặc "Operator" mới nhìn thấy và thao tác được trên module này. | |
+| **AC-02** | **Can thiệp hủy chuyến:** Khi Admin bấm hủy chuyến khẩn cấp, hệ thống phải gửi thông báo ngay lập tức cho cả Tài xế và Khách hàng đang trong chuyến đó. | |
+| **AC-03** | **Lưu Audit Log:** Bất kỳ thao tác can thiệp nào của Admin vào chuyến đi đều phải được lưu vào bảng Log (bao gồm: AdminID, TripID, Hành động, Thời gian). | |
+
+
+# Bước 14: Ma trận truy xuất nguồn gốc yêu cầu (Requirement Traceability Matrix - RTM)
+
+Ma trận này giúp đối chiếu để đảm bảo không có Yêu cầu nghiệp vụ (Business Requirement - BR) nào bị bỏ sót trong quá trình thiết kế Yêu cầu chức năng (Functional Requirement - FR) và Đặc tả Use Case (UC).
+
+## 14.1. Nhóm Khách hàng (Customer)
+
+| Mã BR | Tên Yêu cầu Nghiệp vụ | Mã FR tương ứng | Mã Use Case tương ứng |
+|---|---|---|---|
+| **BR-01** | Đăng ký & đăng nhập | FR-CUS-01, FR-CUS-02 | UC-CUS-01 (Quản lý tài khoản) |
+| **BR-02** | Đặt xe | FR-CUS-03, FR-CUS-04 | UC-CUS-02 (Đặt xe) |
+| **BR-03** | Theo dõi chuyến đi | FR-CUS-05 | UC-CUS-03 (Theo dõi chuyến đi) |
+| **BR-04** | Lịch sử chuyến đi | FR-CUS-07 | UC-CUS-05 (Đánh giá & Xem lịch sử) |
+| **BR-05** | Đánh giá tài xế | FR-CUS-08 | UC-CUS-05 (Đánh giá & Xem lịch sử) |
+| **BR-15** | Phương thức thanh toán | FR-CUS-06 | UC-CUS-04 (Thanh toán cước phí) |
+
+## 14.2. Nhóm Tài xế (Driver)
+
+| Mã BR | Tên Yêu cầu Nghiệp vụ | Mã FR tương ứng | Mã Use Case tương ứng |
+|---|---|---|---|
+| **BR-06** | Quản lý tài khoản & hồ sơ | FR-DRV-01 | UC-DRV-01 (Đăng nhập / Hồ sơ) |
+| **BR-07** | Trạng thái sẵn sàng | FR-DRV-02 | UC-DRV-02 (Bật/Tắt sẵn sàng) |
+| **BR-08** | Nhận & phản hồi chuyến | FR-DRV-03 | UC-DRV-03 (Phản hồi yêu cầu chuyến) |
+| **BR-09** | Cập nhật trạng thái chuyến | FR-DRV-04 | UC-DRV-04 (Cập nhật tiến trình) |
+| **BR-10** | Cập nhật vị trí | FR-DRV-05 | UC-DRV-04 (Chạy ngầm liên tục) |
+
+## 14.3. Nhóm Hệ thống & Xử lý (System/Backend)
+
+| Mã BR | Tên Yêu cầu Nghiệp vụ | Mã FR tương ứng | Mã Use Case liên quan |
+|---|---|---|---|
+| **BR-11** | Xác định tài xế phù hợp | FR-SYS-01 | UC-CUS-02, UC-DRV-03 |
+| **BR-12** | Xử lý khi tài xế không phản hồi | FR-SYS-02 | UC-DRV-03 (Ngoại lệ Timeout) |
+| **BR-13** | Thông báo không tìm được tài xế| FR-SYS-03 | UC-CUS-02 (Ngoại lệ Hết xe) |
+| **BR-14** | Tính cước | FR-SYS-04 | UC-CUS-04, UC-DRV-04 |
+| **BR-16** | Tích hợp thanh toán bên ngoài | FR-SYS-05 | UC-CUS-04 |
+| **BR-17** | Xử lý giao dịch thất bại | FR-SYS-05 | UC-CUS-04 (Ngoại lệ Lỗi giao dịch) |
+| **BR-18, 19, 20** | Engine Thông báo (Push Notification) | FR-SYS-06 | *Tất cả các Use Case có tương tác trạng thái* |
+
+## 14.4. Nhóm Quản trị vận hành (Admin)
+
+| Mã BR | Tên Yêu cầu Nghiệp vụ | Mã FR tương ứng | Mã Use Case tương ứng |
+|---|---|---|---|
+| **BR-21** | Quản lý dữ liệu vận hành | FR-ADM-01 | UC-ADM-01 (Quản lý User) |
+| **BR-22** | Giám sát & xử lý sự cố | FR-ADM-02 | UC-ADM-02 (Giám sát chuyến đi lỗi) |
+| **BR-23** | Tra cứu lịch sử giao dịch | FR-ADM-03 | UC-ADM-03 (Quản lý giao dịch) |
+| **BR-24, 31, 32**| Phân quyền & Xác thực | FR-ADM-04, FR-CUS-01 | *Áp dụng trên toàn bộ hệ thống* |
+| **BR-25** | Báo cáo thống kê | FR-ADM-05 | UC-ADM-04 (Xem báo cáo) |
+| **BR-33, 34** | Bảo vệ dữ liệu & Lưu vết | FR-ADM-06 | UC-ADM-02 (Lưu Audit Log) |
