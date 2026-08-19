@@ -54,9 +54,4 @@ Công ty ABC muốn thay thế hệ thống đặt xe thủ công (tổng đài 
 | **Tài xế** | Thấp | Cao | Trực tiếp "nhận được thông báo và có thể chấp nhận hoặc từ chối chuyến", "cập nhật trạng thái" trong suốt chuyến đi. |
 | **Nhà cung cấp thanh toán bên ngoài** | Trung bình | Trung bình | "Doanh nghiệp muốn tích hợp với một nhà cung cấp thanh toán bên ngoài" nhưng không tham gia vận hành nghiệp vụ hàng ngày. |
 
-## Ma trận Power/Interest
 
-|  | **Interest Thấp** | **Interest Cao** |
-|---|---|---|
-| **Power Cao** | *(không có)* | Ban lãnh đạo, Nhân viên vận hành |
-| **Power Thấp/Trung bình** | Nhà cung cấp thanh toán | Khách hàng, Tài xế |
