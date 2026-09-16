@@ -1,0 +1,57 @@
+get:
+  operationId: getCustomerProfile
+  tags: [Customers]
+  summary: Lay thong tin ca nhan khach hang
+  description: |
+    Tra ve thong tin ho so cua khach hang dang dang nhap.
+    Lien quan: FR-CUS-02, BR-01
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: Thanh cong
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/Customer'
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "403":
+      description: Token hop le nhung khong phai tai khoan khach hang
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/ErrorResponse'
+patch:
+  operationId: updateCustomerProfile
+  tags: [Customers]
+  summary: Cap nhat thong tin ca nhan
+  description: |
+    Cap nhat Ten, Email cua khach hang (khong cho doi SDT vi day la dinh danh dang nhap).
+    Lien quan: FR-CUS-02, BR-01
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            fullName:
+              type: string
+              example: "Nguyen Van A"
+            email:
+              type: string
+              format: email
+  responses:
+    "200":
+      description: Cap nhat thanh cong
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/Customer'
+    "400":
+      $ref: '../../components/responses/_index.yaml#/BadRequest'
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'

@@ -1,0 +1,32 @@
+put:
+  operationId: updateDriverLocation
+  tags: [Drivers]
+  summary: Cap nhat vi tri GPS cua tai xe
+  description: |
+    App tai xe goi dinh ky (VD: moi 3 giay) de cap nhat toa do GPS (FR-DRV-05).
+    He thong dung thong tin nay lam tieu chi "vi tri" khi xac dinh tai xe phu hop
+    (RULE-02) va tinh ETA cho khach hang theo doi chuyen (FR-CUS-05).
+    Lien quan: FR-DRV-05, BR-10, RULE-02
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/_index.yaml#/Location'
+  responses:
+    "200":
+      description: Cap nhat vi tri thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Da cap nhat vi tri"
+    "400":
+      $ref: '../../components/responses/_index.yaml#/BadRequest'
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'

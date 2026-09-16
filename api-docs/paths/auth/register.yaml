@@ -1,0 +1,69 @@
+post:
+  operationId: registerUser
+  tags: [Auth]
+  summary: Dang ky tai khoan
+  description: |
+    Khach hang hoac tai xe tao tai khoan moi qua SDT/Email.
+    Neu role=driver, ho so se o trang thai 'pending' cho den khi Nhan vien van hanh
+    duyet ho so/phuong tien (FR-ADM-01).
+    Lien quan: FR-CUS-01, FR-DRV-01, BR-01, BR-06, BR-31, RULE-07
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [fullName, phone, password, role]
+          properties:
+            fullName:
+              type: string
+              example: "Nguyen Van A"
+            phone:
+              type: string
+              example: "0901234567"
+            email:
+              type: string
+              format: email
+            password:
+              type: string
+              format: password
+              minLength: 6
+            role:
+              type: string
+              enum: [customer, driver]
+              description: "Vai tro tai khoan. operator/admin do Nhan vien van hanh cap tao rieng, khong dang ky qua API nay."
+  responses:
+    "201":
+      description: |
+        Dang ky thanh cong.
+        - role=customer: tai khoan 'active' ngay, co the dang nhap.
+        - role=driver: tai khoan 'pending', cho duyet ho so (FR-ADM-01) truoc khi nhan chuyen.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Dang ky thanh cong"
+              userId:
+                type: string
+                example: "DRV-045"
+              status:
+                type: string
+                enum: [active, pending]
+    "400":
+      description: Du lieu khong hop le (SDT/Email da ton tai, mat khau qua yeu, role khong hop le...)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                enum: [PHONE_ALREADY_EXISTS, EMAIL_ALREADY_EXISTS, WEAK_PASSWORD, INVALID_ROLE]
+                example: "PHONE_ALREADY_EXISTS"
+              message:
+                type: string
+                example: "So dien thoai da duoc su dung"

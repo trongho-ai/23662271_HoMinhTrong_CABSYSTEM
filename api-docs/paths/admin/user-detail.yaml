@@ -1,0 +1,107 @@
+get:
+  operationId: getUserDetail
+  tags: [Admin - Users]
+  summary: Chi tiet nguoi dung
+  description: |
+    Xem thong tin chi tiet tai khoan (bao gom ho so phuong tien neu la tai xe).
+    Lien quan: FR-ADM-01, BR-21
+  security:
+    - BearerAuth: []
+  parameters:
+    - name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    "200":
+      description: Thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+              fullName:
+                type: string
+              phone:
+                type: string
+              email:
+                type: string
+                nullable: true
+              role:
+                type: string
+                enum: [customer, driver]
+              status:
+                type: string
+                enum: [active, pending, banned]
+              vehicle:
+                type: object
+                nullable: true
+                allOf:
+                  - $ref: '../../components/schemas/_index.yaml#/Vehicle'
+                description: "Chi co gia tri khi role=driver."
+              createdAt:
+                type: string
+                format: date-time
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "403":
+      $ref: '../../components/responses/_index.yaml#/Forbidden'
+    "404":
+      $ref: '../../components/responses/_index.yaml#/NotFound'
+patch:
+  operationId: updateUserStatus
+  tags: [Admin - Users]
+  summary: Cap nhat trang thai tai khoan (Duyet ho so / Khoa / Mo khoa)
+  description: |
+    Nhan vien van hanh cap nhat trang thai tai khoan khach hang/tai xe:
+    - status=active: duyet ho so tai xe dang 'pending' (FR-ADM-01), hoac mo khoa tai khoan dang 'banned'.
+    - status=banned: khoa tai khoan.
+    Thao tac nay duoc luu vao Audit Log (RULE-10).
+    Lien quan: FR-ADM-01, BR-21, BR-34, RULE-08, RULE-10
+  security:
+    - BearerAuth: []
+  parameters:
+    - name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status]
+          properties:
+            status:
+              type: string
+              enum: [active, banned]
+            reason:
+              type: string
+              nullable: true
+              example: "Ho so phuong tien hop le, duyet hoat dong"
+  responses:
+    "200":
+      description: Cap nhat thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+              status:
+                type: string
+                enum: [active, banned]
+    "400":
+      $ref: '../../components/responses/_index.yaml#/BadRequest'
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "403":
+      $ref: '../../components/responses/_index.yaml#/Forbidden'
+    "404":
+      $ref: '../../components/responses/_index.yaml#/NotFound'

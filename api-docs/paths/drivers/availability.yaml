@@ -1,0 +1,55 @@
+patch:
+  operationId: updateDriverAvailability
+  tags: [Drivers]
+  summary: Bat/Tat trang thai san sang nhan chuyen
+  description: |
+    Tai xe chuyen doi giua Online (san sang) va Offline (nghi).
+    Chi tai xe co trang thai Online moi duoc phan cong chuyen (RULE-01).
+    Khong cho chuyen ve Offline khi dang co chuyen (in_trip).
+    Lien quan: FR-DRV-02, BR-07, RULE-01
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status]
+          properties:
+            status:
+              type: string
+              enum: [online, offline]
+              description: "online = san sang nhan chuyen; offline = nghi"
+  responses:
+    "200":
+      description: Cap nhat trang thai thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              availabilityStatus:
+                type: string
+                enum: [online, offline]
+    "400":
+      description: Khong the chuyen Offline khi dang trong chuyen di (in_trip)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                example: "DRIVER_IN_TRIP"
+              message:
+                type: string
+                example: "Khong the chuyen sang Offline khi dang thuc hien chuyen di"
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "403":
+      description: Token hop le nhung khong phai tai khoan tai xe, hoac ho so dang 'pending'/'banned'
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/ErrorResponse'

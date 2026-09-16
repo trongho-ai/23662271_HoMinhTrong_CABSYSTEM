@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: CAB System API
+  description: |
+    API documentation cho He thong dat xe CAB (CAB Booking System).
+    Xay dung tu srs.md - Buoc 8 (Functional Requirements), Buoc 9 (Business Rules & Exceptions).
+
+    ## Cac nhom chuc nang chinh
+    - **Auth**: Dang ky, dang nhap, dang xuat
+    - **Customers**: Quan ly ho so khach hang
+    - **Drivers**: Quan ly ho so va trang thai tai xe
+    - **Trips**: Dat xe, theo doi, cap nhat trang thai chuyen di
+    - **Payments**: Thanh toan cuoc xe
+    - **Notifications**: Thong bao push
+    - **Admin**: Quan tri he thong (Users, Trips, Reports, Logs)
+
+    ## Xac thuc
+    Su dung JWT Bearer Token. Lay token tu endpoint POST /auth/login.
+    Phan quyen: Customer < Driver < Operator < Admin (BR-24, BR-32, RULE-08).
+
+    ## Lien ket nghiep vu (xem chi tiet trong srs.md)
+    - FR (Functional Requirements): FR-CUS-01..08, FR-DRV-01..05, FR-SYS-01..06, FR-ADM-01..06
+    - BR (Business Rules): BR-01..34
+    - RULE / EX (Business Rules & Exceptions): RULE-01..10, EX-01..03
+  version: 1.0.1
+  contact:
+    name: Ho Minh Trong
+    email: 23662271@student.iuh.edu.vn
+
+servers:
+  - url: https://api.cabsystem.vn/v1
+    description: Production Server
+  - url: https://staging-api.cabsystem.vn/v1
+    description: Staging Server
+  - url: http://localhost:3000/v1
+    description: Local Development
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Auth
+    description: Xac thuc nguoi dung (dang ky, dang nhap, dang xuat)
+  - name: Customers
+    description: Quan ly thong tin khach hang
+  - name: Drivers
+    description: Quan ly tai xe, trang thai, vi tri GPS
+  - name: Trips
+    description: Dat xe va quan ly chuyen di
+  - name: Payments
+    description: Thanh toan cuoc xe
+  - name: Reviews
+    description: Danh gia trai nghiem chuyen di
+  - name: Notifications
+    description: Thong bao push cho nguoi dung
+  - name: Admin - Users
+    description: Quan tri tai khoan nguoi dung
+  - name: Admin - Trips
+    description: Giam sat va quan tri chuyen di
+  - name: Admin - Reports
+    description: Bao cao thong ke va phan tich
+  - name: Admin - Logs
+    description: Nhat ky he thong va audit log
+
+paths:
+  # ==================== AUTH ====================
+  /auth/register:
+    $ref: "./paths/auth/register.yaml"
+  /auth/login:
+    $ref: "./paths/auth/login.yaml"
+  /auth/logout:
+    $ref: "./paths/auth/logout.yaml"
+
+  # ==================== CUSTOMERS ====================
+  /customers/me:
+    $ref: "./paths/customers/me.yaml"
+
+  # ==================== DRIVERS ====================
+  /drivers/me:
+    $ref: "./paths/drivers/me.yaml"
+  /drivers/me/availability:
+    $ref: "./paths/drivers/availability.yaml"
+  /drivers/me/location:
+    $ref: "./paths/drivers/location.yaml"
+
+  # ==================== TRIPS ====================
+  /trips:
+    $ref: "./paths/trips/trips.yaml"
+  /trips/{tripId}:
+    $ref: "./paths/trips/trip-detail.yaml"
+  /trips/{tripId}/status:
+    $ref: "./paths/trips/trip-status.yaml"
+  /trips/{tripId}/accept:
+    $ref: "./paths/trips/trip-accept.yaml"
+  /trips/{tripId}/reject:
+    $ref: "./paths/trips/trip-reject.yaml"
+  /trips/{tripId}/review:
+    $ref: "./paths/trips/trip-review.yaml"
+
+  # ==================== PAYMENTS ====================
+  /payments/{tripId}:
+    $ref: "./paths/payments/payment.yaml"
+  /payments/{tripId}/retry:
+    $ref: "./paths/payments/payment-retry.yaml"
+
+  # ==================== NOTIFICATIONS ====================
+  /notifications:
+    $ref: "./paths/notifications/notifications.yaml"
+
+  # ==================== ADMIN ====================
+  /admin/users:
+    $ref: "./paths/admin/users.yaml"
+  /admin/users/{userId}:
+    $ref: "./paths/admin/user-detail.yaml"
+  /admin/trips:
+    $ref: "./paths/admin/trips.yaml"
+  /admin/trips/{tripId}/cancel:
+    $ref: "./paths/admin/trip-cancel.yaml"
+  /admin/reports:
+    $ref: "./paths/admin/reports.yaml"
+  /admin/logs:
+    $ref: "./paths/admin/logs.yaml"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      $ref: "./components/securitySchemes/_index.yaml#/BearerAuth"
+
+  schemas:
+    Customer:
+      $ref: "./components/schemas/_index.yaml#/Customer"
+    Driver:
+      $ref: "./components/schemas/_index.yaml#/Driver"
+    Location:
+      $ref: "./components/schemas/_index.yaml#/Location"
+    Vehicle:
+      $ref: "./components/schemas/_index.yaml#/Vehicle"
+    Trip:
+      $ref: "./components/schemas/_index.yaml#/Trip"
+    Payment:
+      $ref: "./components/schemas/_index.yaml#/Payment"
+    Review:
+      $ref: "./components/schemas/_index.yaml#/Review"
+    Notification:
+      $ref: "./components/schemas/_index.yaml#/Notification"
+    AuditLog:
+      $ref: "./components/schemas/_index.yaml#/AuditLog"
+    ErrorResponse:
+      $ref: "./components/schemas/_index.yaml#/ErrorResponse"
+
+  responses:
+    Unauthorized:
+      $ref: "./components/responses/_index.yaml#/Unauthorized"
+    Forbidden:
+      $ref: "./components/responses/_index.yaml#/Forbidden"
+    NotFound:
+      $ref: "./components/responses/_index.yaml#/NotFound"
+    BadRequest:
+      $ref: "./components/responses/_index.yaml#/BadRequest"
