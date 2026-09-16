@@ -1,8 +1,0 @@
-BearerAuth:
-  type: http
-  scheme: bearer
-  bearerFormat: JWT
-  description: |
-    JWT token lay tu POST /auth/login (hoac /auth/register).
-    Bat buoc cho tat ca API tru /auth/register va /auth/login.
-    Lien quan: BR-31, RULE-07.
