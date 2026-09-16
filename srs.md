@@ -1,3 +1,4 @@
+23662271
 # Bước 1: Đọc và phân tích yêu cầu — Business Context & Business Problem
 
 ## Câu hỏi 1: Khách hàng muốn giải quyết vấn đề gì?
