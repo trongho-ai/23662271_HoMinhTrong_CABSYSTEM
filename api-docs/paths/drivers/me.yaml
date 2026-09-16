@@ -1,0 +1,68 @@
+get:
+  operationId: getDriverProfile
+  tags: [Drivers]
+  summary: Lay thong tin ho so tai xe
+  description: |
+    Tra ve thong tin ca nhan va phuong tien cua tai xe.
+    Lien quan: FR-DRV-01, BR-06
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: Thanh cong
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/Driver'
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "403":
+      description: Token hop le nhung khong phai tai khoan tai xe
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/ErrorResponse'
+patch:
+  operationId: updateDriverProfile
+  tags: [Drivers]
+  summary: Cap nhat ho so tai xe
+  description: |
+    Cap nhat thong tin ca nhan va phuong tien.
+    Neu cap nhat phuong tien lan dau/thay doi bien so, ho so co the chuyen lai
+    trang thai 'pending' de Nhan vien van hanh duyet (FR-ADM-01).
+    Lien quan: FR-DRV-01, BR-06
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            fullName:
+              type: string
+            vehicle:
+              type: object
+              properties:
+                licensePlate:
+                  type: string
+                  example: "51A-12345"
+                vehicleType:
+                  type: string
+                  enum: [4_seat, 7_seat, motorbike]
+                brand:
+                  type: string
+                color:
+                  type: string
+  responses:
+    "200":
+      description: Cap nhat thanh cong
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/Driver'
+    "400":
+      $ref: '../../components/responses/_index.yaml#/BadRequest'
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'

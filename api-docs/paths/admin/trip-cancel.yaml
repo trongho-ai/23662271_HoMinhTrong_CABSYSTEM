@@ -1,0 +1,69 @@
+post:
+  operationId: cancelTripByAdmin
+  tags: [Admin - Trips]
+  summary: Huy khan cap mot chuyen di
+  description: |
+    Nhan vien van hanh/Admin can thiep huy chuyen dang bi loi (VD: khach report,
+    xe dung im qua lau). He thong gui thong bao ngay cho ca tai xe va khach hang
+    (AC-02). Thao tac luu Audit Log: AdminID, TripID, action, timestamp (AC-03).
+    Chi ap dung khi chuyen chua 'completed'.
+    Lien quan: FR-ADM-02, BR-22, BR-34, RULE-10
+    Use Case: UC-ADM-02, AC-01 (bao mat truy cap), AC-02, AC-03
+  security:
+    - BearerAuth: []
+  parameters:
+    - name: tripId
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [reason]
+          properties:
+            reason:
+              type: string
+              example: "Tai xe gap su co, khong the tiep tuc"
+  responses:
+    "200":
+      description: Huy chuyen thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tripId:
+                type: string
+              status:
+                type: string
+                example: "cancelled"
+              message:
+                type: string
+                example: "Da huy chuyen va thong bao cho cac ben"
+    "400":
+      description: Chuyen da hoan thanh, khong the huy
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                example: "TRIP_ALREADY_COMPLETED"
+              message:
+                type: string
+                example: "Chuyen da hoan thanh, khong the huy"
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "403":
+      description: Khong du quyen (chi SuperAdmin/Operator - AC-01 bao mat truy cap)
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/_index.yaml#/ErrorResponse'
+    "404":
+      $ref: '../../components/responses/_index.yaml#/NotFound'

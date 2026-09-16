@@ -1,0 +1,124 @@
+post:
+  operationId: createTrip
+  tags: [Trips]
+  summary: Tao yeu cau dat xe
+  description: |
+    Khach hang nhap diem don, diem den, chon loai xe va gui yeu cau.
+    He thong tao Trip voi trang thai 'finding' va bat dau thuat toan Dispatching
+    (tim tai xe Online, gan nhat - RULE-02). Neu tai xe duoc de xuat khong phan hoi/tu
+    choi, he thong tu dong tim tai xe ke tiep (FR-SYS-02) ma khong can khach tao lai
+    yeu cau (EX-01). Neu khong tim duoc tai xe nao, tra ve 404 (EX-02).
+    Lien quan: FR-CUS-03, FR-CUS-04, FR-SYS-01, FR-SYS-02, FR-SYS-03, BR-02, BR-11, RULE-02
+    Use Case: UC-CUS-02, AC-04
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [pickupLat, pickupLng, dropoffLat, dropoffLng, vehicleType]
+          properties:
+            pickupLat:
+              type: number
+              format: double
+              example: 10.7769
+            pickupLng:
+              type: number
+              format: double
+              example: 106.7009
+            dropoffLat:
+              type: number
+              format: double
+              example: 10.7851
+            dropoffLng:
+              type: number
+              format: double
+              example: 106.6940
+            vehicleType:
+              type: string
+              enum: [4_seat, 7_seat, motorbike]
+              description: "Loai xe khach chon. Gia cuoc du kien tra ve theo loai nay (FR-CUS-04)."
+            paymentMethod:
+              type: string
+              enum: [cash, e_wallet, credit_card]
+              default: cash
+              description: "Phuong thuc thanh toan du kien, co the doi lai luc thanh toan (FR-CUS-06)."
+  responses:
+    "201":
+      description: Tao chuyen thanh cong, dang tim tai xe
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tripId:
+                type: string
+                example: "TRIP-001"
+              status:
+                type: string
+                example: "finding"
+              estimatedFare:
+                type: number
+                example: 45000
+    "400":
+      $ref: '../../components/responses/_index.yaml#/BadRequest'
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "404":
+      description: Khong tim thay tai xe nao san sang trong khu vuc (EX-02, RULE cho FR-SYS-03)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                example: "NO_DRIVER_AVAILABLE"
+              message:
+                type: string
+                example: "Hien khong co xe tai khu vuc nay"
+get:
+  operationId: listCustomerTrips
+  tags: [Trips]
+  summary: Xem lich su chuyen di cua khach hang
+  description: |
+    Tra ve danh sach chuyen di da thuc hien (hoan thanh/da huy) kem cuoc phi.
+    Lien quan: FR-CUS-07, BR-04
+  security:
+    - BearerAuth: []
+  parameters:
+    - name: status
+      in: query
+      schema:
+        type: string
+        enum: [completed, cancelled]
+    - name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+    - name: limit
+      in: query
+      schema:
+        type: integer
+        default: 10
+  responses:
+    "200":
+      description: Thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/_index.yaml#/Trip'
+              total:
+                type: integer
+              page:
+                type: integer
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'

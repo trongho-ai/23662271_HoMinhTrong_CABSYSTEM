@@ -1,0 +1,22 @@
+post:
+  operationId: logoutUser
+  tags: [Auth]
+  summary: Dang xuat
+  description: |
+    Huy token hien tai cua nguoi dung.
+    Lien quan: BR-31, RULE-07
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: Dang xuat thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Dang xuat thanh cong"
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'

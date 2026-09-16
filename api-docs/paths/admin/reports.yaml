@@ -1,0 +1,88 @@
+get:
+  operationId: getReports
+  tags: [Admin - Reports]
+  summary: Xuat bao cao thong ke
+  description: |
+    Bao cao so chuyen, doanh thu, ty le hoan thanh, ty le huy, hieu suat tai xe
+    theo khoang thoi gian (RULE-09 - cac chi so bat buoc). Phuc vu Ban lanh dao
+    ra quyet dinh (BG-08).
+    Lien quan: FR-ADM-05, BR-25, RULE-09
+  security:
+    - BearerAuth: []
+  parameters:
+    - name: startDate
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+      example: "2026-01-01"
+    - name: endDate
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+      example: "2026-09-09"
+    - name: type
+      in: query
+      schema:
+        type: string
+        enum: [overview, revenue, driver_performance, cancellation]
+        default: overview
+  responses:
+    "200":
+      description: Thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              period:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    format: date
+                  to:
+                    type: string
+                    format: date
+              totalTrips:
+                type: integer
+                example: 1520
+              completedTrips:
+                type: integer
+                example: 1380
+              cancelledTrips:
+                type: integer
+                example: 140
+              completionRate:
+                type: number
+                example: 90.79
+                description: "Ty le hoan thanh (%). RULE-09."
+              cancellationRate:
+                type: number
+                example: 9.21
+                description: "Ty le huy (%). RULE-09."
+              totalRevenue:
+                type: number
+                example: 62100000
+                description: "Tong doanh thu (VND). RULE-09."
+              topDrivers:
+                type: array
+                description: "Hieu qua hoat dong tai xe. RULE-09."
+                items:
+                  type: object
+                  properties:
+                    driverId:
+                      type: string
+                    fullName:
+                      type: string
+                    completedTrips:
+                      type: integer
+                    avgRating:
+                      type: number
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "403":
+      $ref: '../../components/responses/_index.yaml#/Forbidden'

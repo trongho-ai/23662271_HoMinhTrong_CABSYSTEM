@@ -1,0 +1,64 @@
+post:
+  operationId: reviewTrip
+  tags: [Reviews]
+  summary: Khach hang danh gia tai xe
+  description: |
+    Gui danh gia (1-5 sao) va nhan xet sau khi chuyen hoan thanh. Chi ap dung cho
+    chuyen o trang thai 'completed' va chua duoc danh gia truoc do.
+    Lien quan: FR-CUS-08, BR-05
+    Use Case: UC-CUS-05
+  security:
+    - BearerAuth: []
+  parameters:
+    - name: tripId
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [rating]
+          properties:
+            rating:
+              type: integer
+              minimum: 1
+              maximum: 5
+              example: 5
+            comment:
+              type: string
+              example: "Tai xe lai xe tot, dung gio"
+  responses:
+    "201":
+      description: Danh gia thanh cong
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              reviewId:
+                type: string
+              message:
+                type: string
+                example: "Cam on danh gia cua ban!"
+    "400":
+      description: Chuyen chua hoan thanh hoac da duoc danh gia truoc do
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                enum: [TRIP_NOT_COMPLETED, ALREADY_REVIEWED]
+                example: "ALREADY_REVIEWED"
+              message:
+                type: string
+                example: "Chuyen nay da duoc danh gia"
+    "401":
+      $ref: '../../components/responses/_index.yaml#/Unauthorized'
+    "404":
+      $ref: '../../components/responses/_index.yaml#/NotFound'

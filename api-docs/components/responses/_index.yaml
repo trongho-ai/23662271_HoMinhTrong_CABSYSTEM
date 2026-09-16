@@ -1,0 +1,32 @@
+Unauthorized:
+  description: |
+    Chua xac thuc hoac token het han/khong hop le.
+    Lien quan: BR-31, RULE-07 (bat buoc xac thuc truoc khi dung chuc nang can tai khoan).
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/_index.yaml#/ErrorResponse'
+
+Forbidden:
+  description: |
+    Da xac thuc nhung khong du quyen thuc hien thao tac nay
+    (VD: sai vai tro, hoac Nhan vien van hanh khong co quyen chuc nang nhay cam).
+    Lien quan: BR-24, BR-32, RULE-08 (kiem soat quyen truy cap quan tri).
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/_index.yaml#/ErrorResponse'
+
+NotFound:
+  description: Khong tim thay tai nguyen (ID khong ton tai hoac khong thuoc ve nguoi dung hien tai).
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/_index.yaml#/ErrorResponse'
+
+BadRequest:
+  description: Du lieu dau vao khong hop le (sai kieu, thieu truong bat buoc, sai gia tri enum...).
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/_index.yaml#/ErrorResponse'
