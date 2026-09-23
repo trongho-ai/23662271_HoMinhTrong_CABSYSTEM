@@ -1,7 +1,5 @@
 # Microservice Design theo DDD cho CAB SYSTEM
 
-> **Repository nguồn:** [23662271_HoMinhTrong_CABSYSTEM](https://github.com/trongho-ai/23662271_HoMinhTrong_CABSYSTEM/)  
-> **Tài liệu nguồn chính:** `srs.md`  
 > **Mục tiêu tài liệu:** Phân rã hệ thống CAB theo Domain-Driven Design (DDD), xác định Bounded Context, Ubiquitous Language, Microservice, API, ERD, lựa chọn database và script khởi tạo CSDL cho từng Microservice.
 
 ---
